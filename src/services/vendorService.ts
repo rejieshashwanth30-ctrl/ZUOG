@@ -1,4 +1,5 @@
 import { Vendor, ComplianceStatus } from '@/types';
+import { apiFetch } from '@/lib/api/apiClient';
 
 /**
  * Production Vendor Service Layer
@@ -14,7 +15,7 @@ export class VendorService {
   static async getAllVendors(): Promise<Vendor[]> {
     if (typeof window === 'undefined') return [];
 
-    const res = await fetch('/api/vendors', {
+    const res = await apiFetch('/api/vendors', {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
       cache: 'no-store',
@@ -35,7 +36,7 @@ export class VendorService {
   static async getVendorById(id: string): Promise<Vendor | null> {
     if (typeof window === 'undefined') return null;
 
-    const res = await fetch(`/api/vendors/${encodeURIComponent(id)}`, {
+    const res = await apiFetch(`/api/vendors/${encodeURIComponent(id)}`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
       cache: 'no-store',
@@ -56,7 +57,7 @@ export class VendorService {
    * Creates a new supplier record in Neon PostgreSQL.
    */
   static async createVendor(data: Omit<Vendor, 'id' | 'createdAt' | 'lastUpdated'>): Promise<Vendor> {
-    const res = await fetch('/api/vendors', {
+    const res = await apiFetch('/api/vendors', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -79,7 +80,7 @@ export class VendorService {
    * Updates an existing supplier record in Neon PostgreSQL.
    */
   static async updateVendor(id: string, updates: Partial<Vendor>): Promise<Vendor> {
-    const res = await fetch(`/api/vendors/${encodeURIComponent(id)}`, {
+    const res = await apiFetch(`/api/vendors/${encodeURIComponent(id)}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updates),
@@ -98,7 +99,7 @@ export class VendorService {
    * Deletes a supplier from the workspace in Neon PostgreSQL.
    */
   static async deleteVendor(id: string): Promise<boolean> {
-    const res = await fetch(`/api/vendors/${encodeURIComponent(id)}`, {
+    const res = await apiFetch(`/api/vendors/${encodeURIComponent(id)}`, {
       method: 'DELETE',
     });
 

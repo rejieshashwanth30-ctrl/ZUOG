@@ -1,4 +1,5 @@
 import { DocumentItem, DocumentStatus } from '@/types';
+import { apiFetch } from '@/lib/api/apiClient';
 
 /**
  * Production Document Service Layer
@@ -14,7 +15,7 @@ export class DocumentService {
   static async getAllDocuments(): Promise<DocumentItem[]> {
     if (typeof window === 'undefined') return [];
 
-    const res = await fetch('/api/documents', {
+    const res = await apiFetch('/api/documents', {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
       cache: 'no-store',
@@ -35,7 +36,7 @@ export class DocumentService {
   static async getDocumentsByVendorId(vendorId: string): Promise<DocumentItem[]> {
     if (typeof window === 'undefined') return [];
 
-    const res = await fetch(`/api/documents?vendorId=${encodeURIComponent(vendorId)}`, {
+    const res = await apiFetch(`/api/documents?vendorId=${encodeURIComponent(vendorId)}`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
       cache: 'no-store',
@@ -54,7 +55,7 @@ export class DocumentService {
    * Marks a document as verified with auditor attribution.
    */
   static async verifyDocument(id: string): Promise<DocumentItem> {
-    const res = await fetch(`/api/documents/${encodeURIComponent(id)}/verify`, {
+    const res = await apiFetch(`/api/documents/${encodeURIComponent(id)}/verify`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
     });
@@ -72,7 +73,7 @@ export class DocumentService {
    * Rejects a document with an audit-recorded reason.
    */
   static async rejectDocument(id: string, reason: string): Promise<DocumentItem> {
-    const res = await fetch(`/api/documents/${encodeURIComponent(id)}/reject`, {
+    const res = await apiFetch(`/api/documents/${encodeURIComponent(id)}/reject`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ reason }),
@@ -91,7 +92,7 @@ export class DocumentService {
    * Uploads a real binary file with metadata to the secure storage and Neon database.
    */
   static async uploadRealFile(formData: FormData): Promise<DocumentItem> {
-    const res = await fetch('/api/documents/upload', {
+    const res = await apiFetch('/api/documents/upload', {
       method: 'POST',
       body: formData,
     });
@@ -109,7 +110,7 @@ export class DocumentService {
    * Deletes a document and its associated storage file.
    */
   static async deleteDocument(id: string): Promise<boolean> {
-    const res = await fetch(`/api/documents/${encodeURIComponent(id)}/preview`, {
+    const res = await apiFetch(`/api/documents/${encodeURIComponent(id)}/preview`, {
       method: 'DELETE',
     });
 
@@ -134,7 +135,7 @@ export class DocumentService {
     documentNumber?: string;
     notes?: string;
   }): Promise<DocumentItem> {
-    const res = await fetch('/api/documents', {
+    const res = await apiFetch('/api/documents', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),

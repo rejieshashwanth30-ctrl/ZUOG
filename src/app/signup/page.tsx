@@ -34,6 +34,7 @@ export default function SignupPage() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [isEmailConfirmationPending, setIsEmailConfirmationPending] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,10 +67,35 @@ export default function SignupPage() {
         return;
       }
 
-      // 2. Synchronize user and create the organization workspace in Neon PostgreSQL
+      // 2. Handle email confirmation if required by project configuration
+      if (!authData.session && authData.user) {
+        setIsEmailConfirmationPending(true);
+        setIsLoading(false);
+        return;
+      }
+
+      // 3. Ensure active session in browser client
+      if (authData.session) {
+        await supabase.auth.setSession({
+          access_token: authData.session.access_token,
+          refresh_token: authData.session.refresh_token,
+        });
+      }
+
+      // 4. Synchronize user and create organization workspace in Neon PostgreSQL
+      // Always pass Bearer token and credentials: 'include' for dual-layer authentication
+      const token = authData.session?.access_token;
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const res = await fetch('/api/workspaces', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
+        credentials: 'include',
         body: JSON.stringify({
           companyName: companyName.trim(),
           companyEmail: email.trim(),
@@ -178,144 +204,173 @@ export default function SignupPage() {
       </div>
 
       {/* 16. RIGHT FORM PANEL */}
-      <div className="flex-1 flex flex-col justify-center px-6 sm:px-12 lg:px-16 xl:px-24 py-12">
+      <div className="flex-1 flex flex-col justify-center px-4 sm:px-10 lg:px-16 xl:px-24 py-8 sm:py-12">
         <div className="max-w-md w-full mx-auto">
           {/* Mobile Header */}
-          <div className="lg:hidden flex items-center justify-between mb-8 pb-4 border-b border-slate-200">
-            <BrandLogo variant="full" size="md" href="/" />
+          <div className="lg:hidden flex items-center justify-between mb-6 pb-3 border-b border-slate-200">
+            <BrandLogo variant="full" size="sm" href="/" />
           </div>
 
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Create Workspace</h1>
-            <p className="text-xs text-slate-500 mt-1">
-              Start tracking vendor compliance across your supply chain today.
-            </p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="mt-8 space-y-4">
-            {errorMsg && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-800 flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
-                <span>{errorMsg}</span>
-              </div>
-            )}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                Full Name
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                  <User className="w-4 h-4" />
-                </div>
-                <input
-                  type="text"
-                  required
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Enter your full name"
-                  className="w-full pl-9.5 pr-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0B1E3B] focus:border-transparent transition-all shadow-2xs"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                Company Name
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                  <Building className="w-4 h-4" />
-                </div>
-                <input
-                  type="text"
-                  required
-                  value={companyName}
-                  onChange={(e) => setCompanyName(e.target.value)}
-                  placeholder="e.g. Acme Precision Components Pvt Ltd"
-                  className="w-full pl-9.5 pr-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0B1E3B] focus:border-transparent transition-all shadow-2xs"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                  Work Email
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                    <Mail className="w-4 h-4" />
-                  </div>
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="name@company.com"
-                    className="w-full pl-9.5 pr-3 py-2.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0B1E3B] focus:border-transparent transition-all shadow-2xs"
-                  />
-                </div>
+          {isEmailConfirmationPending ? (
+            <div className="bg-white rounded-xl border border-slate-200 p-6 sm:p-8 text-center space-y-5 shadow-xs">
+              <div className="w-12 h-12 rounded-full bg-teal-50 border border-teal-200 text-[#00A878] flex items-center justify-center mx-auto">
+                <Mail className="w-6 h-6" />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                  Phone Number
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                    <Phone className="w-4 h-4" />
+                <h2 className="text-xl font-bold text-slate-900 tracking-tight">Verify Your Email</h2>
+                <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                  We sent a confirmation link to <strong className="text-slate-900">{email}</strong>.
+                  Please verify your email address, then sign in to access your compliance workspace.
+                </p>
+              </div>
+
+              <div className="pt-2 space-y-3">
+                <Link href="/login" className="block">
+                  <Button fullWidth size="lg">
+                    Proceed to Sign In
+                  </Button>
+                </Link>
+                <p className="text-[11px] text-slate-400">
+                  Didn&apos;t receive it? Check your spam folder or sign in with your password.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div>
+                <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Create Workspace</h1>
+                <p className="text-xs text-slate-500 mt-1">
+                  Start tracking vendor compliance across your supply chain today.
+                </p>
+              </div>
+
+              <form onSubmit={handleSubmit} className="mt-6 sm:mt-8 space-y-3.5 sm:space-y-4">
+                {errorMsg && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-800 flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
+                    <span>{errorMsg}</span>
                   </div>
-                  <input
-                    type="tel"
-                    required
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+91 98400 00000"
-                    className="w-full pl-9.5 pr-3 py-2.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0B1E3B] focus:border-transparent transition-all shadow-2xs"
-                  />
+                )}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                    Full Name
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                      <User className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="text"
+                      required
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder="Enter your full name"
+                      className="w-full pl-9.5 pr-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0B1E3B] focus:border-transparent transition-all shadow-2xs"
+                    />
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                Password
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                  <Lock className="w-4 h-4" />
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                    Company Name
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                      <Building className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="text"
+                      required
+                      value={companyName}
+                      onChange={(e) => setCompanyName(e.target.value)}
+                      placeholder="e.g. Acme Precision Components Pvt Ltd"
+                      className="w-full pl-9.5 pr-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0B1E3B] focus:border-transparent transition-all shadow-2xs"
+                    />
+                  </div>
                 </div>
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Minimum 8 characters"
-                  className="w-full pl-9.5 pr-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0B1E3B] focus:border-transparent transition-all shadow-2xs"
-                />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                      Work Email
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <Mail className="w-4 h-4" />
+                      </div>
+                      <input
+                        type="email"
+                        required
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="name@company.com"
+                        className="w-full pl-9.5 pr-3 py-2.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0B1E3B] focus:border-transparent transition-all shadow-2xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                      Phone Number
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <Phone className="w-4 h-4" />
+                      </div>
+                      <input
+                        type="tel"
+                        required
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="+91 98400 00000"
+                        className="w-full pl-9.5 pr-3 py-2.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0B1E3B] focus:border-transparent transition-all shadow-2xs"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                      <Lock className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="password"
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Minimum 8 characters"
+                      className="w-full pl-9.5 pr-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0B1E3B] focus:border-transparent transition-all shadow-2xs"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <Button type="submit" fullWidth size="lg" isLoading={isLoading}>
+                    Create Workspace
+                  </Button>
+                </div>
+              </form>
+
+              <div className="mt-6 pt-5 border-t border-slate-200 text-center">
+                <p className="text-xs text-slate-500">
+                  Already have an account?{' '}
+                  <Link href="/login" className="font-semibold text-[#0B1E3B] hover:underline">
+                    Sign in
+                  </Link>
+                </p>
               </div>
-            </div>
 
-            <div className="pt-2">
-              <Button type="submit" fullWidth size="lg" isLoading={isLoading}>
-                Create Workspace
-              </Button>
-            </div>
-          </form>
-
-          <div className="mt-6 pt-6 border-t border-slate-200 text-center">
-            <p className="text-xs text-slate-500">
-              Already have an account?{' '}
-              <Link href="/login" className="font-semibold text-[#0B1E3B] hover:underline">
-                Sign in
-              </Link>
-            </p>
-          </div>
-
-          <div className="mt-8 text-center text-[10px] text-slate-400">
-            <div>Build &amp; Develop : Rejiesh Ashwanth V</div>
-            <div>ADYK Multi Venture Company</div>
-          </div>
+              <div className="mt-6 text-center text-[10px] text-slate-400">
+                <div>Build &amp; Develop : Rejiesh Ashwanth V</div>
+                <div>ADYK Multi Venture Company</div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

@@ -16,6 +16,7 @@ import { VendorService } from '@/services/vendorService';
 import { DocumentService } from '@/services/documentService';
 import { ReminderService } from '@/services/reminderService';
 import { supabase } from '@/lib/supabase/client';
+import { apiFetch } from '@/lib/api/apiClient';
 
 interface AppContextType {
   currentUser: { id: string; email: string; name: string } | null;
@@ -159,7 +160,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           });
         }
 
-        const wsRes = await fetch('/api/workspaces').catch(() => null);
+        const wsRes = await apiFetch('/api/workspaces').catch(() => null);
         if (wsRes && wsRes.ok) {
           const { workspace } = await wsRes.json();
           if (workspace) {

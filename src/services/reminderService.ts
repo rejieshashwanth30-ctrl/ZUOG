@@ -1,4 +1,5 @@
 import { Reminder } from '@/types';
+import { apiFetch } from '@/lib/api/apiClient';
 
 /**
  * Production Reminder Service Layer
@@ -14,7 +15,7 @@ export class ReminderService {
   static async getAllReminders(): Promise<Reminder[]> {
     if (typeof window === 'undefined') return [];
 
-    const res = await fetch('/api/reminders', {
+    const res = await apiFetch('/api/reminders', {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
       cache: 'no-store',
@@ -41,7 +42,7 @@ export class ReminderService {
     notes?: string;
     documentType?: string;
   }): Promise<Reminder> {
-    const res = await fetch('/api/reminders', {
+    const res = await apiFetch('/api/reminders', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -60,7 +61,7 @@ export class ReminderService {
    * Deletes a reminder from the workspace.
    */
   static async deleteReminder(id: string): Promise<boolean> {
-    const res = await fetch(`/api/reminders/${encodeURIComponent(id)}`, {
+    const res = await apiFetch(`/api/reminders/${encodeURIComponent(id)}`, {
       method: 'DELETE',
     });
 

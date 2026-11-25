@@ -57,6 +57,15 @@ export async function POST(request: NextRequest) {
       fullName: authUser.name,
     });
 
+    // Idempotent check: If user already has an organization workspace, return it
+    const existing = await WorkspaceRepository.getWorkspaceForUser(dbUser.id);
+    if (existing) {
+      return NextResponse.json(
+        { workspace: existing, message: 'Existing workspace resolved.' },
+        { status: 200 }
+      );
+    }
+
     const workspace = await WorkspaceRepository.createWorkspace({
       ownerId: dbUser.id,
       name: companyName.trim(),

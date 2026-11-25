@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { BrandLogo } from '@/components/ui/BrandLogo';
 import { useApp } from '@/context/AppContext';
+import { apiFetch } from '@/lib/api/apiClient';
 import {
   Building2,
   Users,
@@ -57,7 +58,7 @@ export default function OnboardingPage() {
     setIsFinishing(true);
     try {
       try {
-        await fetch('/api/workspaces', {
+        await apiFetch('/api/workspaces', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

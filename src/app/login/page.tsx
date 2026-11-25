@@ -37,14 +37,34 @@ export default function LoginPage() {
         return;
       }
 
+      if (data.session) {
+        await supabase.auth.setSession({
+          access_token: data.session.access_token,
+          refresh_token: data.session.refresh_token,
+        });
+      }
+
       // Check /api/workspaces to ensure workspace resolution
-      const res = await fetch('/api/workspaces');
+      const headers: Record<string, string> = {};
+      if (data.session?.access_token) {
+        headers['Authorization'] = `Bearer ${data.session.access_token}`;
+      }
+
+      const res = await fetch('/api/workspaces', {
+        headers,
+        credentials: 'include',
+      });
+
       if (res.ok) {
         const { workspace } = await res.json();
         if (workspace) {
           showToast('Welcome back', `Signed in to ${workspace.companyName || workspace.name}.`);
           await refreshData();
           router.push('/dashboard');
+          return;
+        } else {
+          // Authenticated but no workspace registered yet -> onboarding
+          router.push('/onboarding');
           return;
         }
       }
@@ -149,12 +169,12 @@ export default function LoginPage() {
       </div>
 
       {/* 21. LOGIN FORM: RIGHT SIDE */}
-      <div className="flex-1 flex flex-col justify-center px-6 sm:px-12 lg:px-16 xl:px-24 py-12">
+      <div className="flex-1 flex flex-col justify-center px-4 sm:px-10 lg:px-16 xl:px-24 py-8 sm:py-12">
         <div className="max-w-md w-full mx-auto animate-fade-up">
           {/* Mobile Header with clear Logo */}
-          <div className="lg:hidden mb-8">
-            <BrandLogo variant="full" size="md" href="/" />
-            <p className="text-xs text-slate-500 mt-2">
+          <div className="lg:hidden mb-6 pb-3 border-b border-slate-200">
+            <BrandLogo variant="full" size="sm" href="/" />
+            <p className="text-[11px] text-slate-500 mt-1.5">
               Vendor compliance management for Indian manufacturing.
             </p>
           </div>

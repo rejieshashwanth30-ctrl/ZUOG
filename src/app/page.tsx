@@ -172,86 +172,90 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* 11. PRODUCT PREVIEW: Looks like a REAL application screenshot */}
+        {/* 11. PRODUCT PREVIEW: Responsive, compact product preview on mobile, full showcase on desktop */}
         <div id="product" className="relative mx-auto max-w-5xl animate-scale-in">
-          <div className="rounded-xl bg-[#0B1E3B] p-2 sm:p-2.5 shadow-xl ring-1 ring-slate-900/10">
+          <div className="rounded-xl bg-[#0B1E3B] p-1.5 sm:p-2.5 shadow-xl ring-1 ring-slate-900/10">
             <div className="rounded-lg bg-white border border-slate-200 overflow-hidden text-left">
               {/* Realistic Browser Window Top Chrome */}
-              <div className="bg-slate-50 border-b border-slate-200 px-4 py-2.5 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
-                  <span className="text-[11px] font-mono text-slate-400 ml-2">
-                    app.adykzuog.com/dashboard
+              <div className="bg-slate-50 border-b border-slate-200 px-3 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between">
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <div className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-slate-300" />
+                  <div className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-slate-300" />
+                  <div className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-slate-300" />
+                  <span className="text-[10px] sm:text-[11px] font-mono text-slate-400 ml-1.5 sm:ml-2">
+                    app.adykzuog.com<span className="hidden sm:inline">/dashboard</span>
                   </span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded">
+                <div className="flex items-center gap-1.5">
+                  <span className="hidden sm:inline text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded">
                     Live Operational Workspace
+                  </span>
+                  <span className="sm:hidden text-[9px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 px-1.5 py-0.5 rounded flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live
                   </span>
                 </div>
               </div>
 
-              {/* Realistic Dashboard Body */}
-              <div className="p-5 sm:p-6 space-y-5">
+              {/* Responsive Dashboard Body */}
+              <div className="p-3 sm:p-5 md:p-6 space-y-3 sm:space-y-4 md:space-y-5">
                 {/* Dashboard title row */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1 border-b border-slate-100">
+                <div className="flex items-center justify-between gap-2 pb-1 border-b border-slate-100">
                   <div>
-                    <h3 className="text-sm font-bold text-slate-900">Vendor Compliance</h3>
-                    <p className="text-[11px] text-slate-500">124 registered suppliers in current fiscal audit</p>
+                    <h3 className="text-xs sm:text-sm font-bold text-slate-900">Vendor Compliance</h3>
+                    <p className="text-[10px] sm:text-[11px] text-slate-500">124 registered suppliers in current fiscal audit</p>
                   </div>
                   <Link href="/dashboard">
-                    <Button size="sm" variant="outline" rightIcon={<ChevronRight className="w-3 h-3" />}>
-                      Explore Live Workspace
+                    <Button size="sm" variant="outline" rightIcon={<ChevronRight className="w-3 h-3" />} className="h-7 px-2 text-[11px] sm:h-8 sm:px-3 sm:text-xs">
+                      <span className="hidden sm:inline">Explore Live Workspace</span>
+                      <span className="sm:hidden">Explore</span>
                     </Button>
                   </Link>
                 </div>
 
-                {/* 29. Clean Horizontal Metric Row */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  <div className="bg-slate-50/80 p-3.5 rounded-lg border border-slate-200/80">
-                    <span className="text-[11px] text-slate-500 font-medium block">Total Vendors</span>
-                    <span className="text-xl font-bold text-slate-900 mt-1 block">124</span>
-                    <span className="text-[10px] text-slate-400 block mt-0.5">Active supply network</span>
+                {/* 29. Compact Responsive Metric Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+                  <div className="bg-slate-50/80 p-2 sm:p-3.5 rounded-lg border border-slate-200/80">
+                    <span className="text-[10px] sm:text-[11px] text-slate-500 font-medium block">Total Vendors</span>
+                    <span className="text-base sm:text-xl font-bold text-slate-900 mt-0.5 sm:mt-1 block">124</span>
+                    <span className="text-[9px] sm:text-[10px] text-slate-400 block mt-0.5">Active suppliers</span>
                   </div>
 
-                  <div className="bg-emerald-50/40 p-3.5 rounded-lg border border-emerald-100">
-                    <span className="text-[11px] text-emerald-800 font-medium block">Compliant</span>
-                    <span className="text-xl font-bold text-emerald-700 mt-1 block">82</span>
-                    <span className="text-[10px] text-emerald-700 block mt-0.5">All certificates verified</span>
+                  <div className="bg-emerald-50/40 p-2 sm:p-3.5 rounded-lg border border-emerald-100">
+                    <span className="text-[10px] sm:text-[11px] text-emerald-800 font-medium block">Compliant</span>
+                    <span className="text-base sm:text-xl font-bold text-emerald-700 mt-0.5 sm:mt-1 block">82</span>
+                    <span className="text-[9px] sm:text-[10px] text-emerald-700 block mt-0.5">Verified certificates</span>
                   </div>
 
-                  <div className="bg-amber-50/40 p-3.5 rounded-lg border border-amber-100">
-                    <span className="text-[11px] text-amber-800 font-medium block">Expiring Soon</span>
-                    <span className="text-xl font-bold text-amber-700 mt-1 block">21</span>
-                    <span className="text-[10px] text-amber-700 block mt-0.5">Renewal due in &lt;30 days</span>
+                  <div className="bg-amber-50/40 p-2 sm:p-3.5 rounded-lg border border-amber-100">
+                    <span className="text-[10px] sm:text-[11px] text-amber-800 font-medium block">Expiring Soon</span>
+                    <span className="text-base sm:text-xl font-bold text-amber-700 mt-0.5 sm:mt-1 block">21</span>
+                    <span className="text-[9px] sm:text-[10px] text-amber-700 block mt-0.5">Due in &lt;30 days</span>
                   </div>
 
-                  <div className="bg-red-50/40 p-3.5 rounded-lg border border-red-100">
-                    <span className="text-[11px] text-red-800 font-medium block">Action Needed</span>
-                    <span className="text-xl font-bold text-red-700 mt-1 block">9 Expired</span>
-                    <span className="text-[10px] text-slate-500 block mt-0.5">12 Missing Documents</span>
+                  <div className="bg-red-50/40 p-2 sm:p-3.5 rounded-lg border border-red-100">
+                    <span className="text-[10px] sm:text-[11px] text-red-800 font-medium block">Action Needed</span>
+                    <span className="text-base sm:text-xl font-bold text-red-700 mt-0.5 sm:mt-1 block">9 Expired</span>
+                    <span className="text-[9px] sm:text-[10px] text-slate-500 block mt-0.5">12 Missing</span>
                   </div>
                 </div>
 
-                {/* Attention Required Table */}
+                {/* Attention Required Table (Compact on mobile) */}
                 <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
-                  <div className="px-4 py-2.5 bg-slate-50/80 border-b border-slate-200 flex items-center justify-between">
-                    <span className="text-[11px] font-bold text-slate-900 uppercase tracking-wider">
+                  <div className="px-3 sm:px-4 py-2 sm:py-2.5 bg-slate-50/80 border-b border-slate-200 flex items-center justify-between">
+                    <span className="text-[10px] sm:text-[11px] font-bold text-slate-900 uppercase tracking-wider">
                       Attention Required
                     </span>
-                    <span className="text-[11px] text-slate-500">Prioritized for today</span>
+                    <span className="text-[10px] sm:text-[11px] text-slate-500">Prioritized for today</span>
                   </div>
 
                   <div className="divide-y divide-slate-100">
-                    <div className="px-4 py-2.5 flex items-center justify-between hover:bg-slate-50 text-xs">
-                      <div className="min-w-0 pr-3">
-                        <div className="font-semibold text-slate-900">ABC Engineering</div>
-                        <div className="text-slate-500 text-[11px]">Insurance Certificate</div>
+                    <div className="px-3 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between hover:bg-slate-50 text-xs">
+                      <div className="min-w-0 pr-2 sm:pr-3">
+                        <div className="font-semibold text-slate-900 text-xs">ABC Engineering</div>
+                        <div className="text-slate-500 text-[10px] sm:text-[11px]">Insurance Certificate</div>
                       </div>
-                      <div className="flex items-center gap-3 shrink-0">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-amber-50 text-amber-800 border border-amber-200">
+                      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                        <span className="px-1.5 sm:px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-medium bg-amber-50 text-amber-800 border border-amber-200">
                           Expires in 7 days
                         </span>
                         <Link href="/vendors">
@@ -262,13 +266,13 @@ export default function LandingPage() {
                       </div>
                     </div>
 
-                    <div className="px-4 py-2.5 flex items-center justify-between hover:bg-slate-50 text-xs">
-                      <div className="min-w-0 pr-3">
-                        <div className="font-semibold text-slate-900">Sri Lakshmi Metals</div>
-                        <div className="text-slate-500 text-[11px]">GST Certificate</div>
+                    <div className="px-3 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between hover:bg-slate-50 text-xs">
+                      <div className="min-w-0 pr-2 sm:pr-3">
+                        <div className="font-semibold text-slate-900 text-xs">Sri Lakshmi Metals</div>
+                        <div className="text-slate-500 text-[10px] sm:text-[11px]">GST Certificate</div>
                       </div>
-                      <div className="flex items-center gap-3 shrink-0">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                        <span className="px-1.5 sm:px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
                           Missing
                         </span>
                         <Link href="/vendors">
@@ -279,9 +283,9 @@ export default function LandingPage() {
                       </div>
                     </div>
 
-                    <div className="px-4 py-2.5 flex items-center justify-between hover:bg-slate-50 text-xs">
+                    <div className="hidden sm:flex px-4 py-2.5 items-center justify-between hover:bg-slate-50 text-xs">
                       <div className="min-w-0 pr-3">
-                        <div className="font-semibold text-slate-900">XYZ Components</div>
+                        <div className="font-semibold text-slate-900 text-xs">XYZ Components</div>
                         <div className="text-slate-500 text-[11px]">ISO Certificate</div>
                       </div>
                       <div className="flex items-center gap-3 shrink-0">
@@ -644,23 +648,23 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 60. LANDING FOOTER */}
-      <footer className="bg-[#0B1E3B] text-white py-12 border-t border-slate-800">
+      {/* 60. LANDING FOOTER: Compact & professional on mobile, full structure on desktop */}
+      <footer className="bg-[#0B1E3B] text-white py-6 sm:py-8 md:py-12 border-t border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-8 border-b border-slate-700/80">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-5 md:gap-6 pb-5 sm:pb-6 md:pb-8 border-b border-slate-700/80">
+            <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 text-center sm:text-left">
               <BrandLogo variant="dark-panel" size="sm" />
               <div>
-                <div className="text-[11px] font-bold tracking-widest text-teal-400 uppercase font-sans">
+                <div className="text-[10px] sm:text-[11px] font-bold tracking-widest text-teal-400 uppercase font-sans">
                   COMPLIANCE, SIMPLIFIED.
                 </div>
-                <div className="text-[10px] text-slate-400">
+                <div className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5">
                   Vendor Compliance &amp; Document Management
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-wrap justify-center gap-6 text-xs text-slate-300">
+            <div className="flex flex-wrap justify-center gap-x-4 sm:gap-x-6 gap-y-2 text-[11px] sm:text-xs text-slate-300">
               <a href="#product" className="hover:text-white transition-colors">
                 Product
               </a>
@@ -685,7 +689,7 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-4">
+          <div className="pt-4 sm:pt-6 flex flex-col sm:flex-row items-center justify-between text-[11px] sm:text-xs text-slate-400 gap-3 sm:gap-4 text-center sm:text-left">
             <div>
               © 2026 ADYK ZUOG. All rights reserved.
             </div>
@@ -695,7 +699,7 @@ export default function LandingPage() {
               <div className="font-semibold text-slate-200">
                 Build &amp; Develop : Rejiesh Ashwanth V
               </div>
-              <div className="text-slate-400 text-[11px]">
+              <div className="text-slate-400 text-[10px] sm:text-[11px] mt-0.5">
                 ADYK Multi Venture Company
               </div>
             </div>
