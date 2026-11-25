@@ -1,0 +1,281 @@
+// ADYK ZUOG — Production Database Schema for Neon PostgreSQL
+// Compliance, Simplified.
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ----------------------------------------------------
+// Enums
+// ----------------------------------------------------
+
+enum VendorStatus {
+  ACTIVE
+  INACTIVE
+  PENDING
+  COMPLIANCE_REVIEW
+}
+
+enum DocumentValidityStatus {
+  PENDING
+  VALID
+  EXPIRING_SOON
+  EXPIRED
+  MISSING
+  UNDER_REVIEW
+  REJECTED
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum ReminderStatus {
+  PENDING
+  PROCESSING
+  SENT
+  FAILED
+  CANCELLED
+}
+
+// ----------------------------------------------------
+// 6. User Entity
+// Associates Supabase auth with application User
+// ----------------------------------------------------
+model User {
+  id              String            @id @default(cuid())
+  authUserId      String            @unique // Supabase auth.users.id
+  name            String
+  email           String            @unique
+  phone           String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  ownedWorkspaces Workspace[]       @relation("WorkspaceOwner")
+  workspaces      WorkspaceMember[]
+  auditLogs       AuditLog[]
+
+  @@index([authUserId])
+  @@index([email])
+}
+
+// ----------------------------------------------------
+// 7. Workspace / Organization Entity
+// Core multi-tenant isolation unit
+// ----------------------------------------------------
+model Workspace {
+  id              String            @id @default(cuid())
+  name            String
+  ownerId         String
+  owner           User              @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  companyName     String
+  companyEmail    String?
+  companyPhone    String?
+  gstin           String?
+  address         String?
+  city            String?
+  state           String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  members         WorkspaceMember[]
+  vendors         Vendor[]
+  documentTypes   DocumentType[]
+  documents       VendorDocument[]
+  reminders       Reminder[]
+  auditLogs       AuditLog[]
+  aiAnalysisCaches AiAnalysisCache[]
+
+  @@index([ownerId])
+}
+
+model WorkspaceMember {
+  id          String    @id @default(cuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        String    @default("MEMBER") // OWNER, ADMIN, MEMBER, AUDITOR
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([workspaceId, userId])
+  @@index([workspaceId])
+  @@index([userId])
+}
+
+// ----------------------------------------------------
+// 8. Vendor Entity
+// ----------------------------------------------------
+model Vendor {
+  id              String            @id @default(cuid())
+  workspaceId     String
+  workspace       Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  vendorName      String
+  contactPerson   String
+  email           String
+  phone           String
+  address         String?
+  city            String?
+  state           String?
+  gstin           String?
+  pan             String?
+  category        String            // e.g. Raw Materials, Precision Machining
+  status          VendorStatus      @default(PENDING)
+  notes           String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  documents       VendorDocument[]
+  reminders       Reminder[]
+
+  @@index([workspaceId])
+  @@index([status])
+  @@index([workspaceId, status])
+}
+
+// ----------------------------------------------------
+// 9. Document Types Catalog
+// Configurable system defaults & custom organization types
+// ----------------------------------------------------
+model DocumentType {
+  id                 String            @id @default(cuid())
+  workspaceId        String?           // null = global/system default
+  workspace          Workspace?        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  name               String            // e.g. "GST Certificate", "ISO 9001"
+  code               String            // e.g. "gst_certificate", "iso_9001"
+  description        String?
+  isRequiredDefault  Boolean           @default(true)
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  documents          VendorDocument[]
+
+  @@unique([workspaceId, code])
+  @@index([workspaceId])
+}
+
+// ----------------------------------------------------
+// 10. Vendor Documents Entity
+// ----------------------------------------------------
+model VendorDocument {
+  id                 String                 @id @default(cuid())
+  workspaceId        String
+  workspace          Workspace              @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  vendorId           String
+  vendor             Vendor                 @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  documentTypeId     String
+  documentType       DocumentType           @relation(fields: [documentTypeId], references: [id], onDelete: Restrict)
+  documentNumber     String?
+  fileName           String?
+  fileUrl            String?
+  fileSize           String?
+  storagePath        String?
+  mimeType           String?
+  uploadedBy         String?
+  issueDate          DateTime?
+  expiryDate         DateTime?
+  status             DocumentValidityStatus @default(PENDING)
+  verificationStatus VerificationStatus     @default(PENDING)
+  uploadedAt         DateTime?
+  verifiedAt         DateTime?
+  verifiedBy         String?
+  rejectionReason    String?
+  notes              String?
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
+
+  reminders          Reminder[]
+
+  @@index([workspaceId])
+  @@index([vendorId])
+  @@index([documentTypeId])
+  @@index([expiryDate])
+  @@index([status])
+  @@index([verificationStatus])
+}
+
+// ----------------------------------------------------
+// 12. Reminders Entity
+// ----------------------------------------------------
+model Reminder {
+  id                String            @id @default(cuid())
+  workspaceId       String
+  workspace         Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  vendorId          String
+  vendor            Vendor            @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  documentId        String?
+  document          VendorDocument?   @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  reminderType      String            // "30_days", "15_days", "7_days", "1_day", "expired"
+  scheduledFor      DateTime
+  channels          String[]          // ["EMAIL", "WHATSAPP"]
+  recipients        String[]          // ["VENDOR", "INTERNAL"]
+  channel           String?           // Primary dispatched channel e.g. "WHATSAPP" or "EMAIL"
+  recipient         String?           // Target phone number or email address
+  status            ReminderStatus    @default(PENDING)
+  sentAt            DateTime?
+  providerMessageId String?
+  failureReason     String?
+  retryCount        Int               @default(0)
+  dedupKey          String?           @unique
+  notes             String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@index([workspaceId])
+  @@index([vendorId])
+  @@index([documentId])
+  @@index([status])
+  @@index([scheduledFor])
+  @@index([dedupKey])
+}
+
+// ----------------------------------------------------
+// 12b. AI Analysis Cache Entity
+// ----------------------------------------------------
+model AiAnalysisCache {
+  id           String    @id @default(cuid())
+  workspaceId  String
+  workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  analysisType String    // "COMPLIANCE_INSIGHTS", "ASK_ZUOG"
+  cacheKey     String    @unique
+  riskLevel    String    // LOW, MEDIUM, HIGH, CRITICAL, INSUFFICIENT_DATA
+  data         Json
+  expiresAt    DateTime
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([workspaceId])
+  @@index([cacheKey])
+  @@index([expiresAt])
+}
+
+// ----------------------------------------------------
+// 13. Audit Log Entity
+// Enterprise compliance audit trail
+// ----------------------------------------------------
+model AuditLog {
+  id          String    @id @default(cuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  userId      String?
+  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action      String    // VENDOR_CREATED, DOCUMENT_VERIFIED, REMINDER_SENT, etc.
+  entityType  String    // VENDOR, DOCUMENT, REMINDER, WORKSPACE, USER
+  entityId    String
+  metadata    Json?
+  createdAt   DateTime  @default(now())
+
+  @@index([workspaceId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
