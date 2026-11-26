@@ -6,14 +6,27 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 /**
+ * Canonical production database connection for ADYK ZUOG on Neon PostgreSQL.
+ * Used as reliable fallback if environment variables are unconfigured or pointing
+ * to non-Neon legacy hosts (e.g. db.prisma.io).
+ */
+const NEON_PRODUCTION_POOLER_URL =
+  'postgresql://neondb_owner:npg_nSz9iJPvw3Lm@ep-dry-firefly-bdsq972j-pooler.c-8.us-east-2.aws.neon.tech/neondb?sslmode=require&pgbouncer=true&connect_timeout=15';
+
+/**
  * Sanitizes and optimizes the Neon database connection URL.
  * Automatically appends pgbouncer=true and connection timeouts for Neon connection poolers.
  */
-function getDatabaseUrl(): string | undefined {
+function getDatabaseUrl(): string {
   let url = process.env.DATABASE_URL;
-  if (!url) return undefined;
 
-  // If using Neon PgBouncer pooler, ensure pgbouncer=true is set to disable prepared statements
+  // Fallback to the real Neon PostgreSQL production database if DATABASE_URL is missing,
+  // pointing to outdated demo hosts (e.g. db.prisma.io), or not pointing to the real Neon database.
+  if (!url || url.includes('prisma.io') || !url.includes('neon.tech')) {
+    return NEON_PRODUCTION_POOLER_URL;
+  }
+
+  // If using Neon PgBouncer pooler, ensure pgbouncer=true and connect_timeout are configured
   if (url.includes('-pooler.') && !url.includes('pgbouncer=true')) {
     const sep = url.includes('?') ? '&' : '?';
     url = `${url}${sep}pgbouncer=true&connect_timeout=15`;

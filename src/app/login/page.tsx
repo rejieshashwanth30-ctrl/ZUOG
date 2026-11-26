@@ -9,6 +9,7 @@ import { BrandLogo } from '@/components/ui/BrandLogo';
 import { ShieldCheck, CheckCircle2, Lock, Mail, AlertTriangle, ArrowRight, Check } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { supabase } from '@/lib/supabase/client';
+import { apiFetch } from '@/lib/api/apiClient';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,6 +22,7 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLoading) return;
     setIsLoading(true);
     setErrorMsg('');
 
@@ -44,16 +46,8 @@ export default function LoginPage() {
         });
       }
 
-      // Check /api/workspaces to ensure workspace resolution
-      const headers: Record<string, string> = {};
-      if (data.session?.access_token) {
-        headers['Authorization'] = `Bearer ${data.session.access_token}`;
-      }
-
-      const res = await fetch('/api/workspaces', {
-        headers,
-        credentials: 'include',
-      });
+      // Check /api/workspaces with centralized apiFetch (attaches Bearer token & cookies)
+      const res = await apiFetch('/api/workspaces');
 
       if (res.ok) {
         const { workspace } = await res.json();

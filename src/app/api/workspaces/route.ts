@@ -9,25 +9,30 @@ import { WorkspaceRepository } from '@/lib/db/repositories/workspaceRepository';
  * Starts from a fresh empty state without injecting fabricated mock workspaces.
  */
 export async function GET(request: NextRequest) {
+  let stage = 'AUTH_RESOLUTION';
   try {
+    stage = 'AUTH_RESOLUTION';
     const authUser = await getAuthenticatedUser(request);
     if (!authUser) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    stage = 'USER_SYNC';
     const dbUser = await UserRepository.syncAuthUser({
       authUserId: authUser.authUserId,
       email: authUser.email,
       fullName: authUser.name,
     });
 
+    stage = 'WORKSPACE_FETCH';
     const workspace = await WorkspaceRepository.getWorkspaceForUser(dbUser.id);
 
     return NextResponse.json({ workspace: workspace || null }, { status: 200 });
-  } catch (error) {
-    console.error('[API /api/workspaces GET] Error querying Neon database:', error);
+  } catch (error: any) {
+    const errMessage = error instanceof Error ? error.message : 'Unknown database error';
+    console.error(`[API /api/workspaces GET] Error at stage [${stage}]:`, error);
     return NextResponse.json(
-      { error: 'Failed to retrieve workspace from database.' },
+      { error: `Failed to retrieve workspace from database. (${stage}: ${errMessage})` },
       { status: 500 }
     );
   }
