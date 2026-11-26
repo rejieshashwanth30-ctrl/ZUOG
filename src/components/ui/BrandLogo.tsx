@@ -44,19 +44,19 @@ export const BrandLogo = React.memo(function BrandLogo({
           />
         </div>
       ) : variant === 'dark-panel' ? (
-        /* Dark navy panel variant: Clean white card sized responsively based on size prop */
+        /* Dark navy panel variant: Compact, clean white card sized responsively */
         <div
-          className={`inline-flex items-center bg-white rounded-lg sm:rounded-xl shadow-xs border border-white/25 ${
+          className={`inline-flex items-center bg-white rounded-md sm:rounded-xl shadow-xs border border-white/25 ${
             size === 'sm'
-              ? 'px-2.5 py-1 sm:px-3 sm:py-1.5'
-              : 'px-3 py-2 sm:px-4 sm:py-2.5'
+              ? 'px-2 py-0.5 sm:px-3 sm:py-1.5'
+              : 'px-2.5 py-1 sm:px-4 sm:py-2.5'
           }`}
         >
           <div
             className={`relative ${
               size === 'sm'
-                ? 'h-6.5 sm:h-8 w-[110px] sm:w-[130px]'
-                : 'h-9 sm:h-11 w-[150px] sm:w-[180px]'
+                ? 'h-5 sm:h-7 w-[90px] sm:w-[125px]'
+                : 'h-7 sm:h-10 w-[130px] sm:w-[170px]'
             }`}
           >
             <Image
@@ -65,7 +65,7 @@ export const BrandLogo = React.memo(function BrandLogo({
               fill
               priority={priority}
               className="object-contain object-left"
-              sizes="(max-width: 640px) 130px, 200px"
+              sizes="(max-width: 640px) 110px, 180px"
             />
           </div>
         </div>

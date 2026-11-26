@@ -1,11 +1,13 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma, checkDatabaseConnection, getDatabaseUrl } from '@/lib/db/prisma';
 
 /**
  * Health check endpoint for ADYK ZUOG and Neon PostgreSQL.
  * Securely probes the database connection without exposing secrets or passwords.
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Using request prevents static execution during next build prerendering
+  const _ = request.url;
   const dbHealth = await checkDatabaseConnection();
 
   let dbDiagnostics: any = null;

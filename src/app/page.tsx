@@ -201,8 +201,8 @@ export default function LandingPage() {
                 {/* Dashboard title row */}
                 <div className="flex items-center justify-between gap-2 pb-1 border-b border-slate-100">
                   <div>
-                    <h3 className="text-xs sm:text-sm font-bold text-slate-900">Vendor Compliance</h3>
-                    <p className="text-[10px] sm:text-[11px] text-slate-500">124 registered suppliers in current fiscal audit</p>
+                    <h3 className="text-xs sm:text-sm font-bold text-slate-900">Vendor Compliance Engine</h3>
+                    <p className="text-[10px] sm:text-[11px] text-slate-500">Automated multi-channel compliance &amp; document control</p>
                   </div>
                   <Link href="/dashboard">
                     <Button size="sm" variant="outline" rightIcon={<ChevronRight className="w-3 h-3" />} className="h-7 px-2 text-[11px] sm:h-8 sm:px-3 sm:text-xs">
@@ -212,55 +212,55 @@ export default function LandingPage() {
                   </Link>
                 </div>
 
-                {/* 29. Compact Responsive Metric Grid */}
+                {/* 29. Compact Responsive Capability Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
                   <div className="bg-slate-50/80 p-2 sm:p-3.5 rounded-lg border border-slate-200/80">
-                    <span className="text-[10px] sm:text-[11px] text-slate-500 font-medium block">Total Vendors</span>
-                    <span className="text-base sm:text-xl font-bold text-slate-900 mt-0.5 sm:mt-1 block">124</span>
-                    <span className="text-[9px] sm:text-[10px] text-slate-400 block mt-0.5">Active suppliers</span>
+                    <span className="text-[10px] sm:text-[11px] text-slate-500 font-medium block">Audit Readiness</span>
+                    <span className="text-base sm:text-xl font-bold text-slate-900 mt-0.5 sm:mt-1 block">Live Trail</span>
+                    <span className="text-[9px] sm:text-[10px] text-slate-400 block mt-0.5">Automated logging</span>
                   </div>
 
                   <div className="bg-emerald-50/40 p-2 sm:p-3.5 rounded-lg border border-emerald-100">
-                    <span className="text-[10px] sm:text-[11px] text-emerald-800 font-medium block">Compliant</span>
-                    <span className="text-base sm:text-xl font-bold text-emerald-700 mt-0.5 sm:mt-1 block">82</span>
+                    <span className="text-[10px] sm:text-[11px] text-emerald-800 font-medium block">Verification</span>
+                    <span className="text-base sm:text-xl font-bold text-emerald-700 mt-0.5 sm:mt-1 block">Multi-Tier</span>
                     <span className="text-[9px] sm:text-[10px] text-emerald-700 block mt-0.5">Verified certificates</span>
                   </div>
 
                   <div className="bg-amber-50/40 p-2 sm:p-3.5 rounded-lg border border-amber-100">
-                    <span className="text-[10px] sm:text-[11px] text-amber-800 font-medium block">Expiring Soon</span>
-                    <span className="text-base sm:text-xl font-bold text-amber-700 mt-0.5 sm:mt-1 block">21</span>
-                    <span className="text-[9px] sm:text-[10px] text-amber-700 block mt-0.5">Due in &lt;30 days</span>
+                    <span className="text-[10px] sm:text-[11px] text-amber-800 font-medium block">Expiry Engine</span>
+                    <span className="text-base sm:text-xl font-bold text-amber-700 mt-0.5 sm:mt-1 block">T-30 to T-1</span>
+                    <span className="text-[9px] sm:text-[10px] text-amber-700 block mt-0.5">Automated cycles</span>
                   </div>
 
-                  <div className="bg-red-50/40 p-2 sm:p-3.5 rounded-lg border border-red-100">
-                    <span className="text-[10px] sm:text-[11px] text-red-800 font-medium block">Action Needed</span>
-                    <span className="text-base sm:text-xl font-bold text-red-700 mt-0.5 sm:mt-1 block">9 Expired</span>
-                    <span className="text-[9px] sm:text-[10px] text-slate-500 block mt-0.5">12 Missing</span>
+                  <div className="bg-teal-50/40 p-2 sm:p-3.5 rounded-lg border border-teal-100">
+                    <span className="text-[10px] sm:text-[11px] text-teal-800 font-medium block">Dispatch</span>
+                    <span className="text-base sm:text-xl font-bold text-teal-700 mt-0.5 sm:mt-1 block">WhatsApp &amp; Email</span>
+                    <span className="text-[9px] sm:text-[10px] text-teal-600 block mt-0.5">Direct vendor alert</span>
                   </div>
                 </div>
 
-                {/* Attention Required Table (Compact on mobile) */}
+                {/* Workflow Architecture Table */}
                 <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
                   <div className="px-3 sm:px-4 py-2 sm:py-2.5 bg-slate-50/80 border-b border-slate-200 flex items-center justify-between">
                     <span className="text-[10px] sm:text-[11px] font-bold text-slate-900 uppercase tracking-wider">
-                      Attention Required
+                      Compliance Pipeline
                     </span>
-                    <span className="text-[10px] sm:text-[11px] text-slate-500">Prioritized for today</span>
+                    <span className="text-[10px] sm:text-[11px] text-teal-700 font-medium">Real-Time Operational Engine</span>
                   </div>
 
                   <div className="divide-y divide-slate-100">
                     <div className="px-3 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between hover:bg-slate-50 text-xs">
                       <div className="min-w-0 pr-2 sm:pr-3">
-                        <div className="font-semibold text-slate-900 text-xs">ABC Engineering</div>
-                        <div className="text-slate-500 text-[10px] sm:text-[11px]">Insurance Certificate</div>
+                        <div className="font-semibold text-slate-900 text-xs">Mobile Document Upload</div>
+                        <div className="text-slate-500 text-[10px] sm:text-[11px]">Direct mobile camera &amp; gallery file submission</div>
                       </div>
                       <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-                        <span className="px-1.5 sm:px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-medium bg-amber-50 text-amber-800 border border-amber-200">
-                          Expires in 7 days
+                        <span className="px-1.5 sm:px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-medium bg-emerald-50 text-emerald-800 border border-emerald-200">
+                          Secure Link
                         </span>
-                        <Link href="/vendors">
+                        <Link href="/dashboard">
                           <span className="text-xs font-semibold text-[#0B1E3B] hover:text-[#00A878] hover:underline cursor-pointer">
-                            Review
+                            View
                           </span>
                         </Link>
                       </div>
@@ -268,16 +268,16 @@ export default function LandingPage() {
 
                     <div className="px-3 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between hover:bg-slate-50 text-xs">
                       <div className="min-w-0 pr-2 sm:pr-3">
-                        <div className="font-semibold text-slate-900 text-xs">Sri Lakshmi Metals</div>
-                        <div className="text-slate-500 text-[10px] sm:text-[11px]">GST Certificate</div>
+                        <div className="font-semibold text-slate-900 text-xs">Automated Expiry Alerts</div>
+                        <div className="text-slate-500 text-[10px] sm:text-[11px]">30, 15, 7, 1 day &amp; expired triggers</div>
                       </div>
                       <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-                        <span className="px-1.5 sm:px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
-                          Missing
+                        <span className="px-1.5 sm:px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-medium bg-amber-50 text-amber-800 border border-amber-200">
+                          Active
                         </span>
-                        <Link href="/vendors">
+                        <Link href="/reminders">
                           <span className="text-xs font-semibold text-[#0B1E3B] hover:text-[#00A878] hover:underline cursor-pointer">
-                            Review
+                            Rules
                           </span>
                         </Link>
                       </div>
@@ -285,16 +285,16 @@ export default function LandingPage() {
 
                     <div className="hidden sm:flex px-4 py-2.5 items-center justify-between hover:bg-slate-50 text-xs">
                       <div className="min-w-0 pr-3">
-                        <div className="font-semibold text-slate-900 text-xs">XYZ Components</div>
-                        <div className="text-slate-500 text-[11px]">ISO Certificate</div>
+                        <div className="font-semibold text-slate-900 text-xs">Database-Backed Multi-Tenancy</div>
+                        <div className="text-slate-500 text-[11px]">Strict Neon PostgreSQL tenant isolation</div>
                       </div>
                       <div className="flex items-center gap-3 shrink-0">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-amber-50 text-amber-800 border border-amber-200">
-                          Expires in 15 days
+                        <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-800 border border-blue-200">
+                          Isolated
                         </span>
-                        <Link href="/vendors">
+                        <Link href="/compliance">
                           <span className="text-xs font-semibold text-[#0B1E3B] hover:text-[#00A878] hover:underline cursor-pointer">
-                            Review
+                            Audit
                           </span>
                         </Link>
                       </div>
@@ -649,59 +649,59 @@ export default function LandingPage() {
       </section>
 
       {/* 60. LANDING FOOTER: Compact & professional on mobile, full structure on desktop */}
-      <footer className="bg-[#0B1E3B] text-white py-6 sm:py-8 md:py-12 border-t border-slate-800">
+      <footer className="bg-[#0B1E3B] text-white py-4 sm:py-7 md:py-10 border-t border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-5 md:gap-6 pb-5 sm:pb-6 md:pb-8 border-b border-slate-700/80">
-            <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 text-center sm:text-left">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-5 md:gap-6 pb-3 sm:pb-5 md:pb-6 border-b border-slate-800">
+            {/* Logo + Tagline */}
+            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 text-center sm:text-left">
               <BrandLogo variant="dark-panel" size="sm" />
               <div>
-                <div className="text-[10px] sm:text-[11px] font-bold tracking-widest text-teal-400 uppercase font-sans">
+                <div className="text-[10px] sm:text-[11px] font-bold tracking-wider text-teal-400 uppercase font-sans">
                   COMPLIANCE, SIMPLIFIED.
                 </div>
-                <div className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5">
+                <div className="text-[9px] sm:text-[10px] text-slate-400">
                   Vendor Compliance &amp; Document Management
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-wrap justify-center gap-x-4 sm:gap-x-6 gap-y-2 text-[11px] sm:text-xs text-slate-300">
-              <a href="#product" className="hover:text-white transition-colors">
-                Product
-              </a>
-              <a href="#features" className="hover:text-white transition-colors">
-                Features
-              </a>
-              <a href="#how-it-works" className="hover:text-white transition-colors">
-                How It Works
-              </a>
-              <a href="#pricing" className="hover:text-white transition-colors">
-                Pricing
-              </a>
-              <Link href="/privacy" className="hover:text-white transition-colors">
-                Privacy
-              </Link>
-              <Link href="/terms" className="hover:text-white transition-colors">
-                Terms
-              </Link>
-              <Link href="/dashboard" className="text-teal-400 hover:text-teal-300 font-semibold transition-colors">
+            {/* Navigation Links - Single streamlined row on mobile with dot separators */}
+            <div className="flex flex-wrap items-center justify-center gap-x-2 sm:gap-x-4 gap-y-1 text-[11px] sm:text-xs text-slate-300">
+              <a href="#product" className="hover:text-white transition-colors">Product</a>
+              <span className="text-slate-600 sm:hidden">•</span>
+              <a href="#features" className="hover:text-white transition-colors">Features</a>
+              <span className="text-slate-600 sm:hidden">•</span>
+              <a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a>
+              <span className="text-slate-600 sm:hidden">•</span>
+              <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
+              <span className="text-slate-600 sm:hidden">•</span>
+              <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+              <span className="text-slate-600 sm:hidden">•</span>
+              <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
+            </div>
+
+            {/* Workspace Dashboard Link */}
+            <div className="text-center md:text-right">
+              <Link href="/dashboard" className="text-xs font-semibold text-teal-400 hover:text-teal-300 inline-flex items-center gap-1 transition-colors">
                 Workspace Dashboard →
               </Link>
             </div>
           </div>
 
-          <div className="pt-4 sm:pt-6 flex flex-col sm:flex-row items-center justify-between text-[11px] sm:text-xs text-slate-400 gap-3 sm:gap-4 text-center sm:text-left">
+          <div className="pt-3 sm:pt-4 flex flex-col sm:flex-row items-center justify-between text-[10px] sm:text-xs text-slate-400 gap-1.5 sm:gap-4 text-center sm:text-left">
             <div>
               © 2026 ADYK ZUOG. All rights reserved.
             </div>
 
-            {/* 59. Exact attribution */}
+            {/* Attribution */}
             <div className="text-center sm:text-right">
-              <div className="font-semibold text-slate-200">
+              <span className="font-semibold text-slate-200">
                 Build &amp; Develop : Rejiesh Ashwanth V
-              </div>
-              <div className="text-slate-400 text-[10px] sm:text-[11px] mt-0.5">
+              </span>
+              <span className="hidden sm:inline text-slate-500"> • </span>
+              <span className="block sm:inline text-slate-400 text-[10px] sm:text-[11px]">
                 ADYK Multi Venture Company
-              </div>
+              </span>
             </div>
           </div>
         </div>

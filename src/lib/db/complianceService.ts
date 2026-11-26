@@ -98,16 +98,16 @@ export class ComplianceService {
         complianceRate,
       };
     } catch (err) {
-      console.warn('[ComplianceService] Neon offline or error, providing standard baseline metrics:', err);
-      // Clean fallback if database connection is pending configuration
+      console.warn('[ComplianceService] Error querying workspace metrics from Neon:', err);
+      // Strictly genuine zero-state metrics when no records exist
       return {
-        totalVendors: 124,
-        compliant: 82,
-        expiringSoon: 21,
-        expired: 9,
-        missingDocuments: 12,
-        pendingVerification: 4,
-        complianceRate: 66,
+        totalVendors: 0,
+        compliant: 0,
+        expiringSoon: 0,
+        expired: 0,
+        missingDocuments: 0,
+        pendingVerification: 0,
+        complianceRate: 0,
       };
     }
   }

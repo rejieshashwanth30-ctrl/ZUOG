@@ -102,8 +102,8 @@ export async function getAuthenticatedUser(request?: Request): Promise<Authentic
     if (process.env.NODE_ENV !== 'production' && process.env.ALLOW_DEMO_USER === 'true') {
       return {
         authUserId: 'demo-auth-user-001',
-        email: 'rejiesh@abcmfg.co.in',
-        name: 'Rejiesh Ashwanth V',
+        email: 'demo@adykzuog.com',
+        name: 'Demo User',
       };
     }
 

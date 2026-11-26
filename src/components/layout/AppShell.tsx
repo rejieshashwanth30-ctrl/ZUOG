@@ -66,6 +66,7 @@ export function AppShell({ children, pageTitle, pageSubtitle }: AppShellProps) {
     selectedDocForPreview,
     selectedVendorForReminder,
     notifications,
+    vendors,
     kpiStats,
     showToast,
   } = useApp();
@@ -76,15 +77,15 @@ export function AppShell({ children, pageTitle, pageSubtitle }: AppShellProps) {
 
   const unreadNotifications = notifications.filter((n) => !n.read).length;
 
-  const displayName = currentUser?.name || 'Rejiesh Ashwanth V';
-  const workspaceName = currentWorkspace?.companyName || currentWorkspace?.name || 'ABC Manufacturing';
+  const displayName = currentUser?.name || 'User';
+  const workspaceName = currentWorkspace?.companyName || currentWorkspace?.name || 'Workspace';
   const userInitials = displayName
     .split(' ')
     .filter(Boolean)
     .map((n) => n[0])
     .join('')
     .substring(0, 2)
-    .toUpperCase() || 'RA';
+    .toUpperCase() || 'U';
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex text-slate-900">
@@ -239,7 +240,7 @@ export function AppShell({ children, pageTitle, pageSubtitle }: AppShellProps) {
           </button>
 
           <Link
-            href="/vendor-upload/demo-token-abc"
+            href={vendors.length > 0 ? `/vendor-upload/${vendors[0].id}` : '/vendors'}
             target="_blank"
             className="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-teal-800 hover:bg-teal-50 transition-all border border-teal-100/80 mt-2 bg-teal-50/40"
           >
@@ -473,7 +474,7 @@ export function AppShell({ children, pageTitle, pageSubtitle }: AppShellProps) {
                 <span>Settings</span>
               </Link>
               <Link
-                href="/vendor-upload/demo-token-abc"
+                href={vendors.length > 0 ? `/vendor-upload/${vendors[0].id}` : '/vendors'}
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs text-teal-800 bg-teal-50/50"
               >

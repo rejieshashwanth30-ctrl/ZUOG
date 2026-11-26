@@ -20,9 +20,28 @@ import { apiFetch } from '@/lib/api/apiClient';
 
 interface AppContextType {
   currentUser: { id: string; email: string; name: string } | null;
-  currentWorkspace: { id: string; name: string; companyName: string } | null;
+  currentWorkspace: {
+    id: string;
+    name: string;
+    companyName: string;
+    companyEmail?: string;
+    companyPhone?: string;
+    gstin?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+  } | null;
   signOut: () => Promise<void>;
   refreshData: () => Promise<void>;
+  updateWorkspaceData: (updates: {
+    companyName?: string;
+    companyEmail?: string;
+    companyPhone?: string;
+    gstin?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+  }) => Promise<void>;
 
   vendors: Vendor[];
   documents: DocumentItem[];
@@ -76,7 +95,17 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export function AppProvider({ children }: { children: React.ReactNode }) {
   // Session & Workspace State
   const [currentUser, setCurrentUser] = useState<{ id: string; email: string; name: string } | null>(null);
-  const [currentWorkspace, setCurrentWorkspace] = useState<{ id: string; name: string; companyName: string } | null>(null);
+  const [currentWorkspace, setCurrentWorkspace] = useState<{
+    id: string;
+    name: string;
+    companyName: string;
+    companyEmail?: string;
+    companyPhone?: string;
+    gstin?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+  } | null>(null);
 
   // Production Clean Baseline: Starts with empty arrays
   const [vendors, setVendors] = useState<Vendor[]>([]);
@@ -114,12 +143,53 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     [removeToast]
   );
 
+  const refreshWorkspace = useCallback(async () => {
+    try {
+      const wsRes = await apiFetch('/api/workspaces').catch(() => null);
+      if (wsRes && wsRes.ok) {
+        const { workspace } = await wsRes.json();
+        if (workspace) {
+          setCurrentWorkspace(workspace);
+          return workspace;
+        }
+      }
+    } catch (err: any) {
+      console.warn('[AppContext] Could not fetch workspace:', err?.message);
+    }
+    return null;
+  }, []);
+
+  const updateWorkspaceData = useCallback(async (updates: {
+    companyName?: string;
+    companyEmail?: string;
+    companyPhone?: string;
+    gstin?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+  }) => {
+    const res = await apiFetch('/api/workspaces', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updates),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Failed to update workspace.');
+    }
+    const json = await res.json();
+    if (json.workspace) {
+      setCurrentWorkspace(json.workspace);
+    }
+  }, []);
+
   const refreshData = useCallback(async () => {
     try {
-      const [v, d, r] = await Promise.all([
+      const [v, d, r, ws] = await Promise.all([
         VendorService.getAllVendors().catch(() => []),
         DocumentService.getAllDocuments().catch(() => []),
         ReminderService.getAllReminders().catch(() => []),
+        refreshWorkspace(),
       ]);
       setVendors(v);
       setDocuments(d);
@@ -127,7 +197,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     } catch (err: any) {
       console.warn('[AppContext] Could not refresh database records:', err?.message);
     }
-  }, []);
+  }, [refreshWorkspace]);
 
   const signOut = useCallback(async () => {
     try {
@@ -160,15 +230,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           });
         }
 
-        const wsRes = await apiFetch('/api/workspaces').catch(() => null);
-        if (wsRes && wsRes.ok) {
-          const { workspace } = await wsRes.json();
-          if (workspace) {
-            setCurrentWorkspace(workspace);
-          }
-        }
-
-        await refreshData();
+        await Promise.all([
+          refreshWorkspace(),
+          refreshData(),
+        ]);
       } catch (err: any) {
         console.warn('[AppContext] Could not load initial database records:', err?.message);
       }
@@ -185,7 +250,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'User',
           });
         }
-        refreshData();
+        await Promise.all([
+          refreshWorkspace(),
+          refreshData(),
+        ]);
       } else if (event === 'SIGNED_OUT') {
         setCurrentUser(null);
         setCurrentWorkspace(null);
@@ -504,6 +572,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       currentWorkspace,
       signOut,
       refreshData,
+      updateWorkspaceData,
       vendors,
       documents,
       reminders,
@@ -540,6 +609,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       currentWorkspace,
       signOut,
       refreshData,
+      updateWorkspaceData,
       vendors,
       documents,
       reminders,

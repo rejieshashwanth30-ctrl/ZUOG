@@ -124,3 +124,51 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+/**
+ * PATCH /api/workspaces
+ * Updates the authenticated user's organization workspace in Neon PostgreSQL.
+ */
+export async function PATCH(request: NextRequest) {
+  try {
+    const authUser = await getAuthenticatedUser(request);
+    if (!authUser) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const dbUser = await UserRepository.syncAuthUser({
+      authUserId: authUser.authUserId,
+      email: authUser.email,
+      fullName: authUser.name,
+    });
+
+    const currentWs = await WorkspaceRepository.getWorkspaceForUser(dbUser.id);
+    if (!currentWs) {
+      return NextResponse.json({ error: 'Workspace not found.' }, { status: 404 });
+    }
+
+    const body = await request.json().catch(() => ({}));
+    const { companyName, companyEmail, companyPhone, gstin, address, city, state } = body;
+
+    const updatedWorkspace = await WorkspaceRepository.updateWorkspace(currentWs.id, {
+      ...(companyName ? { name: companyName.trim(), companyName: companyName.trim() } : {}),
+      ...(companyEmail !== undefined ? { companyEmail: companyEmail.trim() } : {}),
+      ...(companyPhone !== undefined ? { companyPhone: companyPhone.trim() } : {}),
+      ...(gstin !== undefined ? { gstin: gstin.trim() } : {}),
+      ...(address !== undefined ? { address: address.trim() } : {}),
+      ...(city !== undefined ? { city: city.trim() } : {}),
+      ...(state !== undefined ? { state: state.trim() } : {}),
+    });
+
+    return NextResponse.json(
+      { workspace: updatedWorkspace, message: 'Workspace updated successfully.' },
+      { status: 200 }
+    );
+  } catch (error: any) {
+    console.error('[API /api/workspaces PATCH] Error updating workspace:', error);
+    return NextResponse.json(
+      { error: error?.message || 'Failed to update workspace in Neon.' },
+      { status: 500 }
+    );
+  }
+}

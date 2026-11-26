@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '@/context/AppContext';
 import { AppShell } from '@/components/layout/AppShell';
 import { Button } from '@/components/ui/Button';
@@ -27,18 +27,31 @@ const SETTINGS_NAV_ITEMS = [
 ];
 
 export default function SettingsPage() {
-  const { showToast } = useApp();
+  const { currentWorkspace, currentUser, updateWorkspaceData, showToast } = useApp();
   // 41. SETTINGS Sections: Business Profile, Notification Preferences, Reminder Rules, Team, Security
   const [activeSection, setActiveSection] = useState<
     'profile' | 'notifications' | 'rules' | 'team' | 'security'
   >('profile');
 
-  // Business Profile State
-  const [companyName, setCompanyName] = useState('ABC Manufacturing Pvt Ltd');
-  const [businessType, setBusinessType] = useState('Automotive Components & Precision Machining');
-  const [phone, setPhone] = useState('+91 98401 23456');
-  const [email, setEmail] = useState('rejiesh@abcmfg.co.in');
-  const [address, setAddress] = useState('Plot 18, SIDCO Industrial Estate, Kurichi, Coimbatore, Tamil Nadu');
+  // Business Profile State - dynamically populated from verified Neon workspace
+  const [companyName, setCompanyName] = useState('');
+  const [businessType, setBusinessType] = useState('Manufacturing & Supply Operations');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [address, setAddress] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Sync state whenever active workspace or user resolves from Neon
+  useEffect(() => {
+    if (currentWorkspace) {
+      setCompanyName(currentWorkspace.companyName || currentWorkspace.name || '');
+      setPhone(currentWorkspace.companyPhone || '');
+      setEmail(currentWorkspace.companyEmail || currentUser?.email || '');
+      setAddress(currentWorkspace.address || '');
+    } else if (currentUser) {
+      setEmail(currentUser.email || '');
+    }
+  }, [currentWorkspace, currentUser]);
 
   // Notification Preferences
   const [whatsappEnabled, setWhatsappEnabled] = useState(true);
@@ -54,8 +67,21 @@ export default function SettingsPage() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
 
-  const handleSave = () => {
-    showToast('Settings Saved', 'Your organizational preferences were updated.');
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await updateWorkspaceData({
+        companyName: companyName.trim(),
+        companyEmail: email.trim(),
+        companyPhone: phone.trim(),
+        address: address.trim(),
+      });
+      showToast('Settings Saved', 'Your organizational preferences were updated in Neon PostgreSQL.');
+    } catch (err: any) {
+      showToast('Update Failed', err?.message || 'Could not save workspace settings.', 'error');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -161,7 +187,7 @@ export default function SettingsPage() {
               </div>
 
               <div className="pt-4 border-t border-slate-100 flex justify-end">
-                <Button size="sm" onClick={handleSave}>
+                <Button size="sm" onClick={handleSave} isLoading={isSaving}>
                   Save Profile
                 </Button>
               </div>
@@ -330,56 +356,27 @@ export default function SettingsPage() {
                 <div className="p-3.5 flex items-center justify-between bg-white text-xs">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded bg-[#0B1E3B] text-white flex items-center justify-center font-bold">
-                      RA
+                      {(currentUser?.name || 'U').substring(0, 2).toUpperCase()}
                     </div>
                     <div>
-                      <div className="font-semibold text-slate-900">Rejiesh Ashwanth (You)</div>
-                      <div className="text-[11px] text-slate-400">rejiesh@abcmfg.co.in</div>
+                      <div className="font-semibold text-slate-900">{currentUser?.name || 'Workspace Owner'} (You)</div>
+                      <div className="text-[11px] text-slate-400">{currentUser?.email || email}</div>
                     </div>
                   </div>
                   <div className="text-right">
                     <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 text-[10px] font-bold border border-emerald-200">
-                      Admin & Auditor
+                      Owner &amp; Admin
                     </span>
                     <span className="block text-[10px] text-slate-400 mt-0.5">Full Permissions</span>
                   </div>
                 </div>
+              </div>
 
-                <div className="p-3.5 flex items-center justify-between bg-white text-xs">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded bg-slate-200 text-slate-700 flex items-center justify-center font-bold">
-                      PS
-                    </div>
-                    <div>
-                      <div className="font-semibold text-slate-900">Priya Sharma</div>
-                      <div className="text-[11px] text-slate-400">priya@abcmfg.co.in</div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px] font-medium border border-slate-200">
-                      Procurement Officer
-                    </span>
-                    <span className="block text-[10px] text-slate-400 mt-0.5">Manage Vendors & Reminders</span>
-                  </div>
-                </div>
-
-                <div className="p-3.5 flex items-center justify-between bg-white text-xs">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded bg-slate-200 text-slate-700 flex items-center justify-center font-bold">
-                      MN
-                    </div>
-                    <div>
-                      <div className="font-semibold text-slate-900">M. Natarajan</div>
-                      <div className="text-[11px] text-slate-400">natarajan@abcmfg.co.in</div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px] font-medium border border-slate-200">
-                      Quality Lead
-                    </span>
-                    <span className="block text-[10px] text-slate-400 mt-0.5">Verify Documents</span>
-                  </div>
-                </div>
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-600 space-y-2">
+                <p className="font-semibold text-slate-800">Invite Team Members</p>
+                <p className="text-[11px] text-slate-500">
+                  Grant access to procurement officers, plant managers, or statutory auditors to manage vendor compliance and review certificates collaboratively.
+                </p>
               </div>
             </div>
           )}

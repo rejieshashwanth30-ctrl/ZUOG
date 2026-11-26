@@ -158,6 +158,33 @@ export class WorkspaceRepository {
   }
 
   /**
+   * Updates organization workspace details in Neon PostgreSQL.
+   */
+  static async updateWorkspace(
+    workspaceId: string,
+    data: {
+      name?: string;
+      companyName?: string;
+      companyEmail?: string;
+      companyPhone?: string;
+      gstin?: string;
+      address?: string;
+      city?: string;
+      state?: string;
+    }
+  ): Promise<Workspace> {
+    try {
+      return await prisma.workspace.update({
+        where: { id: workspaceId },
+        data,
+      });
+    } catch (err) {
+      console.error('[WorkspaceRepository] Error updating workspace:', err);
+      throw err;
+    }
+  }
+
+  /**
    * Fetches workspace by ID with member count
    */
   static async getWorkspaceById(workspaceId: string): Promise<Workspace | null> {
