@@ -17,7 +17,7 @@ const NEON_PRODUCTION_POOLER_URL =
  * Sanitizes and optimizes the Neon database connection URL.
  * Automatically appends pgbouncer=true and connection timeouts for Neon connection poolers.
  */
-function getDatabaseUrl(): string {
+export function getDatabaseUrl(): string {
   let url = process.env.DATABASE_URL;
 
   // Fallback to the real Neon PostgreSQL production database if DATABASE_URL is missing,

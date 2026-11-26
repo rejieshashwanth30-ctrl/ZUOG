@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma, checkDatabaseConnection } from '@/lib/db/prisma';
+import { prisma, checkDatabaseConnection, getDatabaseUrl } from '@/lib/db/prisma';
 
 /**
  * Health check endpoint for ADYK ZUOG and Neon PostgreSQL.
@@ -24,12 +24,12 @@ export async function GET() {
       ORDER BY table_name
     `;
 
-    const rawUrl = process.env.DATABASE_URL || '';
+    const activeUrl = getDatabaseUrl();
     let host = 'not_set';
     let databaseFromUrl = 'not_set';
     try {
-      if (rawUrl) {
-        const u = new URL(rawUrl);
+      if (activeUrl) {
+        const u = new URL(activeUrl);
         host = u.host;
         databaseFromUrl = u.pathname.replace(/^\//, '');
       }
