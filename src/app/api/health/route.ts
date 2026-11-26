@@ -18,6 +18,7 @@ export async function GET() {
       connected: dbHealth.connected,
       latencyMs: dbHealth.durationMs ?? 0,
       status: dbHealth.connected ? 'online' : 'unreachable_or_unconfigured',
+      ...(dbHealth.error ? { error: dbHealth.error } : {}),
     },
     auth: {
       provider: 'Supabase Auth',

@@ -40,59 +40,64 @@ export class WorkspaceRepository {
     state?: string;
   }): Promise<Workspace> {
     try {
-      // Create workspace and add owner as member in a transaction
-      return await prisma.$transaction(
-        async (tx) => {
-          const workspace = await tx.workspace.create({
-            data: {
-              name,
-              ownerId,
-              companyName,
-              companyEmail,
-              companyPhone,
-              gstin,
-              address,
-              city,
-              state,
-              members: {
-                create: {
-                  userId: ownerId,
-                  role: 'OWNER',
-                },
-              },
-            },
-          });
-
-          // Seed default document types catalog for this workspace in a single batch query
-          await tx.documentType.createMany({
-            data: DEFAULT_DOCUMENT_TYPES.map((doc) => ({
-              workspaceId: workspace.id,
-              name: doc.name,
-              code: doc.code,
-              description: doc.description,
-              isRequiredDefault: doc.isRequiredDefault,
-            })),
-          });
-
-          // Record audit log
-          await tx.auditLog.create({
-            data: {
-              workspaceId: workspace.id,
+      // 1. Create workspace and add owner as member in a single atomic database operation.
+      // In PostgreSQL, nested relational create is executed within an atomic internal transaction.
+      const workspace = await prisma.workspace.create({
+        data: {
+          name,
+          ownerId,
+          companyName,
+          companyEmail,
+          companyPhone,
+          gstin,
+          address,
+          city,
+          state,
+          members: {
+            create: {
               userId: ownerId,
-              action: 'WORKSPACE_CREATED',
-              entityType: 'WORKSPACE',
-              entityId: workspace.id,
-              metadata: {
-                companyName,
-                gstin,
-              },
+              role: 'OWNER',
             },
-          });
-
-          return workspace;
+          },
         },
-        { timeout: 30000, maxWait: 15000 }
-      );
+      });
+
+      // 2. Seed default statutory document types catalog for this workspace in a single batch query
+      try {
+        await prisma.documentType.createMany({
+          data: DEFAULT_DOCUMENT_TYPES.map((doc) => ({
+            workspaceId: workspace.id,
+            name: doc.name,
+            code: doc.code,
+            description: doc.description,
+            isRequiredDefault: doc.isRequiredDefault,
+          })),
+          skipDuplicates: true,
+        });
+      } catch (seedErr) {
+        console.warn('[WorkspaceRepository] Document type seeding non-fatal warning:', seedErr);
+      }
+
+      // 3. Record audit log
+      try {
+        await prisma.auditLog.create({
+          data: {
+            workspaceId: workspace.id,
+            userId: ownerId,
+            action: 'WORKSPACE_CREATED',
+            entityType: 'WORKSPACE',
+            entityId: workspace.id,
+            metadata: {
+              companyName,
+              gstin,
+            },
+          },
+        });
+      } catch (auditErr) {
+        console.warn('[WorkspaceRepository] Audit log creation non-fatal warning:', auditErr);
+      }
+
+      return workspace;
     } catch (err) {
       console.error('[WorkspaceRepository] Error creating workspace:', err);
       throw err;

@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { supabase } from '@/lib/supabase/client';
+import { apiFetch } from '@/lib/api/apiClient';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -38,12 +39,13 @@ export default function SignupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLoading) return;
     setIsLoading(true);
     setErrorMsg('');
 
     try {
       // 1. Sign up user in Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      let { data: authData, error: authError } = await supabase.auth.signUp({
         email: email.trim(),
         password,
         options: {
@@ -54,17 +56,28 @@ export default function SignupPage() {
         },
       });
 
+      // If user is already registered in Supabase Auth, attempt sign-in with provided password
       if (authError) {
         if (authError.message.toLowerCase().includes('already registered')) {
-          setErrorMsg('An account with this email already exists. Please sign in instead.');
-          showToast('Account Exists', 'Please sign in with your email and password.', 'warning');
+          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+            email: email.trim(),
+            password,
+          });
+
+          if (!signInError && signInData.session) {
+            authData = signInData;
+          } else {
+            setErrorMsg('An account with this email already exists. Please sign in with your password.');
+            showToast('Account Exists', 'Please sign in with your email and password.', 'warning');
+            setIsLoading(false);
+            return;
+          }
+        } else {
+          setErrorMsg(authError.message);
+          showToast('Registration Error', authError.message, 'error');
           setIsLoading(false);
           return;
         }
-        setErrorMsg(authError.message);
-        showToast('Registration Error', authError.message, 'error');
-        setIsLoading(false);
-        return;
       }
 
       // 2. Handle email confirmation if required by project configuration
@@ -83,7 +96,7 @@ export default function SignupPage() {
       }
 
       // 4. Synchronize user and create organization workspace in Neon PostgreSQL
-      // Always pass Bearer token and credentials: 'include' for dual-layer authentication
+      // Use centralized apiFetch with explicit Bearer token and credentials: 'include'
       const token = authData.session?.access_token;
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
@@ -92,10 +105,9 @@ export default function SignupPage() {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const res = await fetch('/api/workspaces', {
+      const res = await apiFetch('/api/workspaces', {
         method: 'POST',
         headers,
-        credentials: 'include',
         body: JSON.stringify({
           companyName: companyName.trim(),
           companyEmail: email.trim(),
@@ -105,7 +117,10 @@ export default function SignupPage() {
 
       if (!res.ok) {
         const errJson = await res.json().catch(() => ({}));
-        throw new Error(errJson.error || 'Failed to initialize organization workspace in Neon.');
+        const detailedMsg = errJson.details
+          ? `${errJson.error || 'Failed to create workspace in Neon.'} (${errJson.details})`
+          : (errJson.error || 'Failed to initialize organization workspace in Neon.');
+        throw new Error(detailedMsg);
       }
 
       showToast('Workspace Created', `Welcome to ADYK ZUOG, ${fullName}! Setting up your workspace.`);

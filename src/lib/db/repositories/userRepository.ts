@@ -18,22 +18,33 @@ export class UserRepository {
     phone?: string;
   }): Promise<User> {
     try {
+      // 1. Check if user already exists by Supabase authUserId
       const existing = await prisma.user.findUnique({
         where: { authUserId },
       });
 
       if (existing) {
+        // Update name or phone if provided and currently empty
+        if ((name && existing.name === 'User' && name !== 'User') || (phone && !existing.phone)) {
+          return await prisma.user.update({
+            where: { id: existing.id },
+            data: {
+              name: name || existing.name,
+              phone: phone || existing.phone,
+            },
+          });
+        }
         return existing;
       }
 
-      // Check if email already registered with different auth ID
+      // 2. Check if email already registered with different auth ID (e.g. migration or provider switch)
       const byEmail = await prisma.user.findUnique({
         where: { email },
       });
 
       if (byEmail) {
-        return prisma.user.update({
-          where: { email },
+        return await prisma.user.update({
+          where: { id: byEmail.id },
           data: {
             authUserId,
             name: name || byEmail.name,
@@ -42,15 +53,29 @@ export class UserRepository {
         });
       }
 
-      // Create new application User record in Neon
-      return await prisma.user.create({
-        data: {
-          authUserId,
-          email,
-          name: name || 'User',
-          phone,
-        },
-      });
+      // 3. Create new application User record in Neon
+      // Includes race-condition protection (P2002) for rapid mobile double-taps
+      try {
+        return await prisma.user.create({
+          data: {
+            authUserId,
+            email,
+            name: name || 'User',
+            phone,
+          },
+        });
+      } catch (createErr: any) {
+        if (createErr?.code === 'P2002') {
+          console.warn('[UserRepository] Concurrent user creation detected, retrieving record...');
+          const retryUser = await prisma.user.findFirst({
+            where: {
+              OR: [{ authUserId }, { email }],
+            },
+          });
+          if (retryUser) return retryUser;
+        }
+        throw createErr;
+      }
     } catch (err) {
       console.error('[UserRepository] Error syncing user to Neon:', err);
       throw err;
